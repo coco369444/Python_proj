@@ -13,10 +13,11 @@ import os
 import re
 from datetime import datetime
 
+path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
 
 def assign_paiment(old_df):
     
-    df_category = pd.read_excel((r"D:\Corentin\Bureau\bank account management\data\categorisize_paiment.xlsx").replace("\\","/"))
+    df_category = pd.read_excel((path_source+r"\categorisize_paiment.xlsx").replace("\\","/"))
     categories = []
     for i in range(len(old_df)):
         comand = old_df.iloc[i].lower()
@@ -40,23 +41,27 @@ def import_bnp_data(path):
     df_op.columns = data.iloc[1,:-1]
         
     info_account=data.columns
-    account_name = info_account[0] + " " + info_account[2]
+    
+    account_name = info_account[0]
     data_bnp = pd.DataFrame(index=df_op.index)
     data_bnp["category"]=assign_paiment(df_op["Libelle operation"])
-    data_bnp["amount"]=df_op["Montant operation en euro"]
-    data_bnp["Date"]=df_op["Date operation"]
+    data_bnp["amount"]=df_op["Montant operation"]
+    data_bnp["Date"]= pd.to_datetime(df_op["Date operation"],format='%d-%m-%Y')
         
         
     data_bnp = data_bnp.sort_index(ascending=False)
         
     data_bnp["bank"]="BNP"
     data_bnp["currency"]="EUR"
+    
+    date = info_account[0][9:]
         
-    amount_acc = pd.DataFrame([[info_account[-3],"EUR",info_account[-1]]],index=[account_name],columns=["Date","Currency","Amount"])
+    amount_acc = pd.DataFrame([[date,"EUR",info_account[2]]],index=[account_name],columns=["Date","Currency","Amount"])
     
     return data_bnp,amount_acc
 
 def import_CS_data(path):
+    
     data = pd.read_excel(path)
     df_op = data.iloc[8:-1,:-1]
     df_op.columns = data.iloc[7,:-1]

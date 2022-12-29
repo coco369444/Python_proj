@@ -11,12 +11,12 @@ import os
 from Utils_import_data import import_bnp_data,import_CS_data,import_Revolut_data,import_JB_data
 
 
+path_source =r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
 
-
-paths =[(r"D:\Corentin\Bureau\bank account management\data\BNP").replace("\\","/"),
-        (r"D:\Corentin\Bureau\bank account management\data\CS").replace("\\","/"),
-        (r"D:\Corentin\Bureau\bank account management\data\Revolut").replace("\\","/"),
-        (r"D:\Corentin\Bureau\bank account management\data\JB").replace("\\","/"),
+paths =[(path_source+r"\BNP").replace("\\","/"),
+        (path_source+r"\CS").replace("\\","/"),
+        (path_source+r"\Revolut").replace("\\","/"),
+        (path_source+r"\JB").replace("\\","/"),
         ]
 
 functions_data = [import_bnp_data,import_CS_data,import_Revolut_data,import_JB_data]
@@ -34,7 +34,8 @@ for i in range(len(paths)) :
         df_operations=pd.concat((df_operations,df_op_i))
         df_accounts=pd.concat((df_accounts,df_acc_i))
 
+
 df_operations["Date"]=pd.to_datetime(df_operations["Date"],format="%Y-%m-%d")
-df_operations.to_csv((r"D:\Corentin\Bureau\bank account management\data\data_operations.xlsx").replace("\\","/"),index=False)
-df_accounts.to_csv((r"D:\Corentin\Bureau\bank account management\data\data_accounts.xlsx").replace("\\","/"),index=False)
+df_operations.to_csv((path_source+r"\data_operations.xlsx").replace("\\","/"),index=False)
+df_accounts.to_csv((path_source+r"\data_accounts.xlsx").replace("\\","/"),index=False)
 

@@ -19,7 +19,8 @@ app = dash.Dash(__name__)
 all_options = {
     'EUR': ['BNP', 'Revolut', 'JB'],
     'CHF': ['CS', 'Revolut', 'JB'],
-    'USD': ['JB']
+    'USD': ['JB'],
+    'SGD':['Revolut']
 }
 
 app.layout = html.Div([
@@ -31,6 +32,7 @@ app.layout = html.Div([
                 {'label': 'EUR', 'value': 'EUR'},
                 {'label': 'CHF', 'value': 'CHF'},
                 {'label': 'USD', 'value': 'USD'},
+                {'label': 'SGD', 'value': 'SGD'},
                 #{'label': 'All', 'value': 'All'},
             ],
             value='CHF',

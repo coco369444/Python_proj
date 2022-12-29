@@ -14,6 +14,7 @@ from plotly.offline import download_plotlyjs, init_notebook_mode,  plot
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+path_source =r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
 
 
 
@@ -57,7 +58,8 @@ def create_fig(currency,banks,normalized=False,nb_month=6):
             "Other" : 'rgb(0,0,0)'
         }
     
-    data = pd.read_csv((r"D:\Corentin\Bureau\bank account management\data\data_operations.xlsx").replace("\\","/"))
+    
+    data = pd.read_csv((path_source+r"\data_operations.xlsx").replace("\\","/"))
     
     data.set_index("Date",inplace=True)
     df_cc=data.loc[data["currency"]==currency]
