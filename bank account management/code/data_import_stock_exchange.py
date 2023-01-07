@@ -11,7 +11,12 @@ import os
 import re
 from datetime import datetime
 
-path = (r"D:\Corentin\Bureau\bank account management\data\JB_bourse").replace("\\","/")
+
+#path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+path_source = r"G:\Python Github\Python_proj\bank account management\data"
+
+path = path_source.replace("\\","/")
+#path = (r"D:\Corentin\Bureau\bank account management\data\JB_bourse").replace("\\","/")
 xls_name = [ name for name in os.listdir(path) if not os.path.isdir(os.path.join(path, name)) ][0]
 path_csv = path+"/"+xls_name
 

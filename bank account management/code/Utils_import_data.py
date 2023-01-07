@@ -13,7 +13,8 @@ import os
 import re
 from datetime import datetime
 
-path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+#path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+path_source = r"G:\Python Github\Python_proj\bank account management\data"
 
 def assign_paiment(old_df):
     
@@ -45,6 +46,7 @@ def import_bnp_data(path):
     account_name = info_account[0]
     data_bnp = pd.DataFrame(index=df_op.index)
     data_bnp["category"]=assign_paiment(df_op["Libelle operation"])
+    data_bnp["infos"]=df_op["Libelle operation"]
     data_bnp["amount"]=df_op["Montant operation"]
     data_bnp["Date"]= pd.to_datetime(df_op["Date operation"],format='%d-%m-%Y')
         
@@ -53,6 +55,7 @@ def import_bnp_data(path):
         
     data_bnp["bank"]="BNP"
     data_bnp["currency"]="EUR"
+    
     
     date = info_account[0][9:]
         
@@ -78,6 +81,7 @@ def import_CS_data(path):
     data_date=pd.to_datetime(data_date.replace("Prénotages",date_pre),format='%d.%m.%Y')
     data_cs = pd.DataFrame(index=df_op.index)
     data_cs["category"]=assign_paiment(df_op["Texte"])
+    data_cs["infos"]=df_op["Texte"]
     data_cs["Date"]=data_date
     data_cs["Date"]= pd.to_datetime(data_cs["Date"])
     data_cs["amount"]=df_op["Crédit"].fillna(0) - df_op["Débit"].fillna(0) 
@@ -97,6 +101,7 @@ def import_Revolut_data(path):
     
     data_revolut = pd.DataFrame(index=data.index)
     data_revolut["category"]=assign_paiment(data["Description"])
+    data_revolut["infos"]=data["Description"]
     data["Completed Date"]=data["Completed Date"].fillna(datetime.now().strftime('%Y-%m-%d'))
     data_revolut["Date"]= data["Completed Date"]
     data_revolut["amount"]=data["Amount"]
@@ -114,6 +119,7 @@ def import_JB_data(path):
     data_JB =pd.DataFrame(index=data.index)
     
     data_JB["category"]=assign_paiment(data["Texte de l'écriture"])
+    data_JB["infos"]=data["Texte de l'écriture"]
     date = data["Date de valeur"]
     
     

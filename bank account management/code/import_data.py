@@ -11,7 +11,8 @@ import os
 from Utils_import_data import import_bnp_data,import_CS_data,import_Revolut_data,import_JB_data
 
 
-path_source =r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+#path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+path_source = r"G:\Python Github\Python_proj\bank account management\data"
 
 paths =[(path_source+r"\BNP").replace("\\","/"),
         (path_source+r"\CS").replace("\\","/"),
@@ -36,6 +37,6 @@ for i in range(len(paths)) :
 
 
 df_operations["Date"]=pd.to_datetime(df_operations["Date"],format="%Y-%m-%d")
-df_operations.to_csv((path_source+r"\data_operations.xlsx").replace("\\","/"),index=False)
-df_accounts.to_csv((path_source+r"\data_accounts.xlsx").replace("\\","/"),index=False)
+df_operations.to_excel((path_source+r"\data_operations.xlsx").replace("\\","/"),index=False)
+df_accounts.to_csv((path_source+r"\data_accounts.csv").replace("\\","/"),index=False)
 

@@ -14,7 +14,8 @@ from plotly.offline import download_plotlyjs, init_notebook_mode,  plot
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-path_source =r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+#path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+path_source = r"G:\Python Github\Python_proj\bank account management\data"
 
 
 
@@ -25,7 +26,7 @@ def create_fig(currency,banks,normalized=False,nb_month=6):
   
     food_palette=[rgb_to_hex(c) for c in  sns.color_palette("Blues", 8)[3:]]
     inc_money_pal = [rgb_to_hex(c) for c in  sns.color_palette("Greens", 10)[3:]]
-    service_pal = [rgb_to_hex(c) for c in  sns.color_palette("Oranges", 11)[3:]]
+    service_pal = [rgb_to_hex(c) for c in  sns.color_palette("Oranges", 12)[3:]]
     shopping_pal = [rgb_to_hex(c) for c in  sns.color_palette("RdPu", 9)[3:]]
     
         
@@ -55,11 +56,12 @@ def create_fig(currency,banks,normalized=False,nb_month=6):
             'furniture': shopping_pal[5],
             'tax & continuous service': service_pal[5],
             'stock exchange': inc_money_pal[5],
+            "travel" :service_pal[6],
             "Other" : 'rgb(0,0,0)'
         }
     
     
-    data = pd.read_csv((path_source+r"\data_operations.xlsx").replace("\\","/"))
+    data = pd.read_excel((path_source+r"\data_operations.xlsx").replace("\\","/"))
     
     data.set_index("Date",inplace=True)
     df_cc=data.loc[data["currency"]==currency]
@@ -92,17 +94,40 @@ def create_fig(currency,banks,normalized=False,nb_month=6):
         for d in df_sum.index:
             
             df2.loc[((df2["Date"]==d[0]) & (df2["type"]==d[1])),"amount"]=(df2.loc[((df2["Date"]==d[0]) & (df2["type"]==d[1])),"amount"]*10000/df_sum.loc[d]).astype("int")/100
+    df2["Date_2"]=df2["Date"].copy()
     df2["Date"]=df2["Date"].dt.strftime('%b%y')
+    df2= df2.sort_values("Date")
     layout = go.Layout(barmode='stack',autosize=False,width=1900,height=700)
     fig = go.Figure(layout=layout)
+    
+    #fig.update_layout(
+    #template="simple_white",
+    #xaxis=dict(title_text="Date"),
+    #yaxis=dict(title_text="Amount in {currency}"),
+    #barmode="stack")
+    
+    df_init = df2[["Date","differences","type","Date_2"]].drop_duplicates()
+    df_init= df_init.sort_values(["Date_2","type"])
+    df_init["amount"]=0
+    
+    
+    fig.add_trace(go.Bar(x=[df_init["Date"]+" : "+df_init["differences"].astype("str"),df_init["type"]], y=df_init["amount"]))
+    #                     category_orders=df_init["Date"]))
+    #fig.add_trace(go.Bar(x=[df_init["Date"]+" : "+df_init["differences"].astype("str"),"incomes"], y=df_init["amount"]))
+    
     for cat in df2.category.unique():
         #offsetgroup= 0+
         plot_df = df2[df2.category==cat]
         fig.add_trace(go.Bar(x=[plot_df["Date"]+" : "+plot_df["differences"].astype("str"),plot_df["type"]], y=plot_df["amount"], name=cat,marker_color=color_discrete_map[cat]))
     
+    
+    
+    
     fig.update_xaxes(title_text="Date")
     fig.update_yaxes(title_text=f"Amount in {currency}")
-        
+    #fig.update_xaxes(categoryorder='category ascending')
+    #fig.layout.xaxis.tickvals = pd.date_range(min(df2["Date_2"]), max(df2["Date_2"]), freq='MS')
+    #fig.layout.xaxis.tickformat = '%b'
     
     return fig
 

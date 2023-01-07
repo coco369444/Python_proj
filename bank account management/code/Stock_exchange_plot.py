@@ -9,7 +9,11 @@ import numpy as np
 import yfinance as yf
 import datetime 
 
-data = pd.read_excel((r"D:\Corentin\Bureau\bank account management\data\JB_stock_exchange.xlsx").replace("\\","/"))
+
+#path_source = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\bank account management\data"
+path_source = r"G:\Python Github\Python_proj\bank account management\data"
+
+data = pd.read_excel((path_source+r"\JB_stock_exchange.xlsx").replace("\\","/"))
 
 today = datetime.date.today().strftime("%Y-%m-%d")
 start_date = (datetime.date.today() - datetime.timedelta(days=10*365)).strftime("%Y-%m-%d")
