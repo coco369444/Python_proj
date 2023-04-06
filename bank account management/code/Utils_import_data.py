@@ -57,9 +57,10 @@ def import_bnp_data(path):
     data_bnp["currency"]="EUR"
     
     
-    date = info_account[0][9:]
+    date = info_account[1][9:]
         
     amount_acc = pd.DataFrame([[date,"EUR",info_account[2]]],index=[account_name],columns=["Date","Currency","Amount"])
+    amount_acc["bank"]="BNP"
     
     return data_bnp,amount_acc
 
@@ -75,6 +76,7 @@ def import_CS_data(path):
     acc_name = data.iloc[3,1].partition('\n')[0]
     acc_amount = data.iloc[8,-1]
     info_acc = pd.DataFrame([[date,"CHF",acc_amount]],index=[acc_name],columns=["Date","Currency","Amount"])
+    info_acc["bank"]="CS"
     
     data_date = df_op["Date comptable"]
     date_pre = data_date.loc[data_date!="Prénotages"].iloc[0]
@@ -98,6 +100,7 @@ def import_Revolut_data(path):
     date=data["Completed Date"].iloc[-1]
     currency = data["Currency"].iloc[-1]
     acc_info = pd.DataFrame([[date,currency,amount]],index=[f"Revolut {currency}"],columns=["Date","Currency","Amount"])
+    acc_info["bank"]="Revolut"
     
     data_revolut = pd.DataFrame(index=data.index)
     data_revolut["category"]=assign_paiment(data["Description"])
@@ -116,6 +119,7 @@ def import_JB_data(path):
     date_start=data.iloc[0,1]
     currency = data.columns[5][6:]
     acc_info = pd.DataFrame([[date_start,currency,amount]],index=[f"JB {currency}"],columns=["Date","Currency","Amount"])
+    acc_info["bank"]="JB"
     data_JB =pd.DataFrame(index=data.index)
     
     data_JB["category"]=assign_paiment(data["Texte de l'écriture"])
