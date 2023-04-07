@@ -11,6 +11,11 @@ import pandas as pd
 from ta.volume import OnBalanceVolumeIndicator
 from ta.momentum import PercentagePriceOscillator
 from ta.volume import ChaikinMoneyFlowIndicator
+from ta.momentum import RSIIndicator, StochasticOscillator
+
+import ta
+import numpy as np
+
 
 url = 'https://api.binance.com/api/v3/klines'
 interval = '2h'
@@ -38,7 +43,8 @@ while old_start_time != start_time:
 
 df = pd.concat(df_list[::-1]).drop_duplicates()
 
-path = r"G:\Python Github\Python_proj\Binance_trading"
+#path = r"G:\Python Github\Python_proj\Binance_trading"
+path = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\Binance_trading"
 
 df.to_csv(path+"/history_base_eth.csv")
 
@@ -81,4 +87,54 @@ df['PPO'] = ppo.ppo().shift(1)
 cmf = ChaikinMoneyFlowIndicator(df['High'].shift(1), df['Low'].shift(1), df['Close'].shift(1), df['Volume'].shift(1))
 df['CMF'] = cmf.chaikin_money_flow().shift(1)
 
-#df['OsMA'] = ppo.osma().shift(1)
+# Calculer les rendements
+returns = np.log(df['Close'] / df['Close'].shift(1))
+df["return"]=returns.shift(1)
+
+# Calculer les indicateurs de marché
+df['ret_MA_10'] = returns.rolling(10).mean().shift(1)
+df['ret_MA_20'] = returns.rolling(20).mean().shift(1)
+df['ret_MA_50'] = returns.rolling(50).mean().shift(1)
+df['ret_std_10'] = returns.rolling(10).std().shift(1)
+df['ret_std_20'] = returns.rolling(20).std().shift(1)
+df['ret_std_50'] = returns.rolling(50).std().shift(1)
+
+
+# Calculer les indicateurs RSI, Stochastique et MACD
+rsi = RSIIndicator(close=returns, window=14)
+df['RSI'] = rsi.rsi()
+
+stoch = StochasticOscillator(high=returns, low=returns, close=returns, window=14, smooth_window=3)
+df['%K'] = stoch.stoch()
+
+# Calculer le MACD avec TA-Lib
+#df['macd'], df['macdsignal'], df['macdhist'] = ta.MACD(df['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
+
+def get_macd(price, slow, fast, smooth):
+    exp1 = price.ewm(span = fast, adjust = False).mean()
+    exp2 = price.ewm(span = slow, adjust = False).mean()
+    macd = pd.DataFrame(exp1 - exp2).rename(columns = {'Close':'macd'})
+    signal = pd.DataFrame(macd.ewm(span = smooth, adjust = False).mean()).rename(columns = {'macd':'macd_signal'})
+    
+    hist = pd.DataFrame(macd['macd'] - signal['macd_signal']).rename(columns = {0:'macd_hist'})
+    frames =  (macd, signal, hist)
+    print(frames)
+    df = pd.concat(frames, axis = 1)
+    return df
+
+macd_df = get_macd(df['Close'], slow=26, fast=12, smooth=9).shift(1)
+df=pd.concat((df,macd_df),axis=1)
+
+
+
+label = returns.rolling(10).mean().shift(-10)
+
+# Supprimer les lignes qui contiennent des valeurs NaN
+df.dropna(inplace=True)
+
+df_seleced = df[[ 'RSI','Momentum_1', 'Momentum_7', 'OBV', 'PPO',
+       'CMF', 'return', 'ret_MA_10', 'ret_MA_20', 'ret_MA_50', 'ret_std_10',
+       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist',
+       'label']]
+
+
