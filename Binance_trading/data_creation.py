@@ -127,14 +127,68 @@ df=pd.concat((df,macd_df),axis=1)
 
 
 
-label = returns.rolling(10).mean().shift(-10)
+df['label'] = (1+returns).rolling(10).apply(np.prod, raw=True).shift(-10)-1
 
 # Supprimer les lignes qui contiennent des valeurs NaN
-df.dropna(inplace=True)
+
 
 df_seleced = df[[ 'RSI','Momentum_1', 'Momentum_7', 'OBV', 'PPO',
        'CMF', 'return', 'ret_MA_10', 'ret_MA_20', 'ret_MA_50', 'ret_std_10',
-       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist',
-       'label']]
+       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist','label'
+       ]]
+
+df_seleced.dropna(inplace=True)
+
+X = df_seleced[[ 'RSI','Momentum_1', 'Momentum_7', 'OBV', 'PPO',
+       'CMF', 'return', 'ret_MA_10', 'ret_MA_20', 'ret_MA_50', 'ret_std_10',
+       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist'
+       ]]
+Y_ret = df_seleced["label"]
+
+Y_buy = Y_ret > 0.01
+Y_sell=Y_ret <0
+
+
+import lightgbm as lgb
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score,precision_score,recall_score
+
+# Diviser les données en ensembles d'entraînement et de test en tenant compte de la temporalité
+split_index = int(len(X) * 0.8)  # 80% des données pour l'entraînement, 20% pour les tests
+X_train, X_test = X[:split_index], X[split_index:]
+y_train, y_test = Y_buy[:split_index], Y_buy[split_index:]
+
+# Créer un dataset LightGBM à partir des données d'entraînement
+train_data = lgb.Dataset(X_train, label=y_train)
+# Définir les paramètres du modèle LightGBM
+params = {
+    'objective': 'binary',
+    'metric': 'binary_logloss',
+    'boosting_type': 'gbdt',
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+    'bagging_freq': 5,
+    'verbose': 0
+}
+# Entraîner le modèle LightGBM
+model_buy = lgb.train(params, train_data, num_boost_round=1000)
+
+# Faire des prédictions sur l'ensemble de test
+y_pred = model_buy.predict(X_test)
+y_pred = np.round(y_pred)  # Convertir les prédictions en valeurs binaires (0 ou 1)
+
+# Évaluer la précision du modèle
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+
+
+
+
 
 
