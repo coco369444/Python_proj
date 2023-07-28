@@ -42,9 +42,10 @@ while old_start_time != start_time:
     print(start_time)
 
 df = pd.concat(df_list[::-1]).drop_duplicates()
+df=df.iloc[:-1]
 
-#path = r"G:\Python Github\Python_proj\Binance_trading"
-path = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\Binance_trading"
+path = r"G:\Python Github\Python_proj\Binance_trading"
+#path = r"C:\Users\cbour\OneDrive\Bureau\Python proj\Python_proj\Binance_trading"
 
 df.to_csv(path+"/history_base_eth.csv")
 
@@ -134,7 +135,7 @@ df.dropna(inplace=True)
 
 df_seleced = df[[ 'RSI','Momentum_1', 'Momentum_7', 'OBV', 'PPO',
        'CMF', 'return', 'ret_MA_10', 'ret_MA_20', 'ret_MA_50', 'ret_std_10',
-       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist',
-       'label']]
+       'ret_std_20', 'ret_std_50', '%K', 'macd', 'macd_signal', 'macd_hist'
+       ]]
 
 
